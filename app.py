@@ -15,10 +15,12 @@ def main():
 
         try:
             # 2. Retrive Relevent chunks
-            context = get_retrival_context(
-                query= user_query,
-                k= config.NUMBER_OF_CHUNKS_TO_RETURN
+            retrieval_payload = get_retrival_context(
+                user_query,
+                k=config.NUMBER_OF_CHUNKS_TO_RETURN
             )
+            context = retrieval_payload["context"]
+            sources = retrieval_payload["sources"]
 
             if not context:
                 print("⚠️ Warning: No matching documents found in the database. Proceeding with empty context.")
@@ -30,13 +32,17 @@ def main():
             )
 
             # 4. Display the clean output
-            print("\n✨ LLM's Context:")
-            print("=" * 60)
-            print(context)
-            print("=" * 60)
             print("\n✨ LLM's Answer:")
             print("=" * 60)
             print(answer)
+            print("=" * 60)
+            # Print precise structural traces
+            print("📚 Sources Used:")
+            if sources:
+                for source in sources:
+                    print(f"  📄 {source}")
+            else:
+                print("  ❓ No local sources were matched.")
             print("=" * 60)
 
         except Exception as e:
